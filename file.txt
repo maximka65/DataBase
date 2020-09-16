@@ -1,0 +1,74 @@
+USE vk;
+
+-- 1)
+UPDATE users SET created_at = NOW(),
+	updated_at = NOW();		
+
+SELECT created_at, updated_at  FROM users;
+
+DESCRIBE users;
+
+
+-- 2) 
+
+UPDATE users SET created_at = STR_TO_DATE(created_at, '%d.%m.%Y %k:%i'),
+	updated_at = STR_TO_DATE(updated_at, '%d.%m.%Y %k:%i');
+
+ALTER TABLE users CHANGE created_at created_at DATETIME DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE users CHANGE updated_at updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
+
+-- 3)
+ 
+CREATE TABLE storehouses_products (
+	id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	value INT UNSIGNED NOT NULL
+);
+
+INSERT INTO storehouses_products (value) VALUES (0);
+INSERT INTO storehouses_products (value) VALUES (2500);
+INSERT INTO storehouses_products (value) VALUES (30);
+INSERT INTO storehouses_products (value) VALUES (500);
+INSERT INTO storehouses_products (value) VALUES (1);
+
+
+
+SELECT * FROM storehouses_products ORDER BY IF(value > 0, 0, 1), value;
+
+DROP TABLE storehouses_products;
+
+-- 4
+
+SELECT id, birthday FROM profiles WHERE SUBSTRING(birthday, 6, 7) IN (6, 8);
+
+-- 1
+
+DESCRIBE profiles;
+
+SELECT id, birthday FROM profiles LIMIT 10;
+
+SELECT 
+	COUNT(*) AS total, 
+	SUBSTRING(birthday, 1, 4) AS yr 
+FROM 
+	profiles 
+GROUP BY 
+	yr;
+
+SELECT CEIL(AVG(SUBSTRING(birthday, 1, 4))) FROM profiles;
+
+-- 2
+
+SELECT 
+    DATE_FORMAT(DATE(CONCAT_WS('-', YEAR(NOW()), MONTH(birthday), DAY(birthday))), '%W') AS days,
+	COUNT(*) AS total
+FROM 
+	profiles 
+GROUP BY 
+	days
+ORDER BY 
+	total DESC;
+
+
+
+
+
