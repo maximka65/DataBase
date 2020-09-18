@@ -162,29 +162,41 @@ DESC profiles;
 DESC likes;
 
 SELECT 
-		COUNT(user_id) AS how_much_likes,
-		'likes'
+		COUNT(user_id),
+		user_id
 	FROM 
 		likes
-	WHERE user_id IN 
-		(SELECT id FROM profiles
-		 ORDER BY SUBSTRING(birthday, 1, 4) DESC LIMIT 10);
+	GROUP BY 
+		user_id;
+	
+	
+-- DESC users;
+DESC profiles;
+DESC likes;
 
+		
+SELECT COUNT(*) FROM
+		(SELECT 
+		(SELECT COUNT(user_id) AS how_much_likes FROM likes WHERE likes.user_id = profiles.id)
+	from profiles
+		ORDER BY SUBSTRING(birthday, 1, 4) LIMIT 10) AS lk;
+
+	
 -- 5 Чем меньше лайков тем меньше активности
 DESC posts;
 DESC likes;
 
 SELECT 
-		CONCAT(first_name,' ',second_name) AS name
-	FROM 
-		users 
-	WHERE id IN 
+		CONCAT(first_name,' ',second_name) AS name,
 		(SELECT 
-			 COUNT(user_id) AS how_much_activity,
-			 user_id AS u
+			 COUNT(user_id) AS how_much_activity
 		 FROM 
 		 	 likes
+		 WHERE user_id = users.id
 	 	 GROUP BY 
 		 	 user_id
-	 	 ORDER BY 
-			 how_much_activity DESC LIMIT 10);
+		 ) AS lk
+	FROM 
+		users
+	ORDER BY lk DESC LIMIT 10;
+
