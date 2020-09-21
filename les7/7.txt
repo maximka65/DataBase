@@ -1,0 +1,22 @@
+-- 1
+
+SELECT 
+    * 
+  FROM 
+    users 
+  JOIN 
+    (SELECT user_id FROM orders)
+  ON 
+    users.id = orders.user_id;
+
+-- 2
+
+SELECT 
+	p.id, p.name, c.name
+  FROM 
+    products AS p
+  JOIN
+    catalogs AS c
+  ON 
+    p.catalog_id = c.id;
+    
