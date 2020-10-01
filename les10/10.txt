@@ -1,0 +1,43 @@
+USE vk;
+
+-- 1
+DESC users;
+
+CREATE UNIQUE INDEX users_first_name_idx_uq ON users(first_name);
+
+DESC profiles;
+
+CREATE INDEX profiles_birthday_idx ON profiles(birthday);
+
+DESC messages;
+
+CREATE INDEX messages_from_user_id_to_user_id_idx ON messages(from_user_id, to_user_id);
+
+-- 2
+DESC comunities_users;
+SELECT * FROM comunities_users;
+DESC profiles;
+DESC users;
+
+SELECT
+		p.id,
+		u.first_name AS name,
+		comunities_users.community_id,
+		p.birthday AS bth,
+		AVG(cnt) OVER w AS 'average',
+		MIN(p.birthday) OVER w AS 'min_bth',
+		MAX(p.birthday) OVER w AS 'max_bth',
+		cnt AS 'users_per_comunity',
+		COUNT(u.id) OVER() AS 'total_users',
+		(cnt / COUNT(u.id) OVER()) * 100 AS '%_from_total' 
+FROM comunities_users
+	JOIN (select community_id, count(*) as cnt
+      FROM comunities_users
+	  GROUP BY community_id) AS count_users_per_comunity
+	ON comunities_users.community_id = count_users_per_comunity.community_id
+	JOIN profiles AS p
+	ON comunities_users.user_id = p.id
+	JOIN users AS u
+	ON comunities_users.user_id = u.id
+	WINDOW w AS (PARTITION BY comunities_users.community_id);
+
