@@ -1,0 +1,44 @@
+USE vk;
+
+DROP TRIGGER insert_logs_time_entry;
+DROP TABLE logs;
+
+CREATE TABLE logs(
+	id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	entry_id INT UNSIGNED NOT NULL,
+	table_name VARCHAR(100) NOT NULL,
+	entry_name VARCHAR(100) NOT NULL,
+	created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+) ENGINE=Archive;
+
+-- код между delimiter нужно выполнять целеком в другом файле
+
+DELIMITER //
+
+CREATE TRIGGER insert_logs_time_entry AFTER INSERT ON users
+FOR EACH ROW BEGIN
+	INSERT INTO logs(entry_id, table_name, entry_name, created_at) 
+		VALUES (NEW.id, 'users', NEW.first_name, NEW.created_at);
+END//
+	
+
+CREATE TRIGGER insert_logs_time_entry AFTER INSERT ON catalogs
+FOR EACH ROW BEGIN
+	INSERT INTO logs(entry_id, table_name, entry_name, created_at) 
+		VALUES (NEW.id, 'catalogs', NEW.name, NEW.created_at);
+END//
+
+CREATE TRIGGER insert_logs_time_entry AFTER INSERT ON products
+FOR EACH ROW BEGIN
+	INSERT INTO logs(entry_id, table_name, entry_name, created_at) 
+		VALUES (NEW.id, 'products', NEW.name, NEW.created_at);
+END//
+DELIMITER ;
+
+select * FROM users LIMIT 10;
+INSERT INTO users (first_name, second_name, email, phone)
+	VALUES ('max', 'cur', 'joe@mjdm.com', 02388048);
+	
+SELECT * FROM logs;
+
+
